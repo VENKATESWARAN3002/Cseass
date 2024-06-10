@@ -1,0 +1,291 @@
+*{
+    margin: 0;
+    padding: 0;
+    font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande", "Lucida Sans", Arial, sans-serif;
+}
+
+section {
+    display: inline-block;
+
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    width: 100%;
+    background: url("ptu_admin_img.jpg") no-repeat;
+    background-position: center;
+    background-size: cover;
+}
+
+.form-box {
+    position: relative;
+    width: 400px;
+    height: 100% ;
+    padding-top:20px;
+    padding-bottom: 20px;
+    background: transparent;
+    border: none;
+    border-radius: 20px;
+    backdrop-filter: blur(1px) brightness(80%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+ select .option1 {
+        background-color: rgba(255, 255, 255, 0); /* Adjust the alpha channel (4th value) to make the background more or less transparent */
+        color: white;
+      }
+
+
+h2 {
+    font-size: 2em;
+    color: #fff;
+    text-align: center;
+}
+
+.inputbox {
+    position: relative;
+    margin: 30px 0;
+    width: 310px;
+    border-bottom: 2px solid #fff;
+}
+
+.inputbox label {
+    position: absolute;
+    top: 50%;
+    left: 5px;
+    transform: translateY(-50%); /* Center label vertically */
+    color: #fff;
+    font-size: 1em;
+    pointer-events: none; /* Prevent label from triggering input on click */
+    transition: 0.5s; 
+}
+
+/* animations: start */
+.inputbox input:focus ~ label,  /* Move label on input focus */
+.inputbox label:hover ~ label {
+    top: -5px;
+}
+
+/* animation:end */
+.inputbox input {
+    width: 100%;
+    height: 50px;
+    background: transparent;
+    border: none;
+    outline: none;
+    font-size: 1em;
+    padding: 0 35px 0 5px;
+    color: #fff;
+}
+
+.inputbox ion-icon {
+    position: absolute;
+    right: 8px;
+    color: #fff;
+    font-size: 1.2em;
+    top: 20px;
+}
+
+.forget {
+    margin: -10px 0 17px;
+    font-size: 0.9em;
+    color: #fff;
+    display: flex;
+    justify-content: space-between;
+}
+
+.forget label input {
+    margin-right: 3px;
+}
+
+.forget a {
+    color: #fff;
+    text-decoration: none;
+}
+
+.forget a:hover {
+    text-decoration: underline;
+}
+
+button {
+    width: 100%;
+    height: 40px;
+    border-radius: 40px;
+    background-color: #fff;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    font-size: 1em;
+    font-weight: 600;
+}
+
+.register {
+    font-size: 0.9em;
+    color: #fff;
+    text-align: center;
+    margin: 25px 0 10px;
+}
+
+.register p a {
+    text-decoration: none;
+    color: #fff;
+    font-weight: 600;
+}
+
+.register p a:hover {
+    color:wheat;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+@media screen and (max-width: 480px) {
+    .form-box {
+        width: 100%;
+        border-radius: 0px;
+    }
+}
+
+img{
+width: 150px;
+height: 200px;
+left:10;
+text-align: center;
+}
+ 
+.main-icon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px
+    }
+    .icon1 {
+        margin: 0 0 1em;
+        padding: .8em 1em;
+        background: rgba(255, 255, 255, 0.94);
+        border-radius: 0.25rem;  
+    }
+
+.form-box select {
+    appearance:none;
+    outline: none;
+  font-size: 15px;
+  color: white;
+  border: none;
+  width: 90%;
+  display: inline-block;
+  background: transparent;
+  letter-spacing: 1px;
+    }
+     
+    .form-box select option {
+        background-color: rgba(255, 255, 255, 0); /* Adjust the alpha channel (4th value) to make the background more or less transparent */
+        color: white;
+      }
+
+    .selectbox {
+        position: relative;
+        margin: 30px 0;
+        width: 310px;
+        background-color:transparent;
+        border-bottom: 2px solid #fff;
+    }
+
+    .selectbox i.fa {
+    
+        display: inline;
+        color: #fff;
+        width: 22px;
+    }
+    .form-box .selectbox i {
+        position: absolute;
+        right: 8px;
+        color: #fff;
+        font-size: 1.2em;
+        top: -10px;
+    }
+    .selectbox label {
+        position: absolute;
+        top: -25px;
+        color: #fff;
+        font-size: 1em;
+        pointer-events: none;
+        transition: 0.5s;
+    }
+    .form-box select option {
+        background-color:#d45353;/* Change this to your desired background color */
+        color: honeydew; /* Change this to your desired text color */
+      }
+      
+    .btn{
+        position: relative;
+        display:inline-block;
+        font-size:1.5rem;
+        letter-spacing: .1em;
+        color:#A8422D;
+        text-decoration:none;
+        text-transform:uppercase;
+        border: 2px solid #A8422D;
+        padding: 10px 30px;
+        overflow:hidden;
+        z-index: 1;
+        transition: 1s;
+        padding-top: 2px;
+        }
+        
+        .btn:hover{
+        color:hsla(0, 0%, 96%, 0.952)
+        }
+       .btn:hover::before{
+            width: 100%;
+            }
+        .btn::before{
+        content: '';
+        position:absolute;
+        top:0;
+        left: -50px;
+        width: 0;
+        height:100%;
+        background:#A8422D;
+        transform:skewX(65deg);
+        z-index: -1;
+        transition: 1s;
+        }
+    /* animations: start */
+    /* Style the dropdown button */
+select {
+    background-color: #b43434;
+    border: 1px solid #d84040;
+    border-radius: 4px;
+    padding: 10px;
+    display: inline-block;
+    font-size: 16px;
+  }
+  
+  /* Style the dropdown list (hidden by default) */
+  select:after {
+    content: "\f0d7"; /* Font Awesome arrow icon */
+    font-family: FontAwesome; /* Replace with your font family */
+    color: black;
+    float: right;
+    margin-left: 10px;
+    margin-top: 4px;
+    cursor: pointer;
+  }
+  
+  /* Show the dropdown list on hover */
+  select:hover {
+    background-color: #ddd;
+  }
+  
+  /* Style the dropdown options */
+  option {
+    color: rgb(209, 65, 65);
+    background-color: #fff;
+  }
+  
+  /* Style the selected option */
+  option:checked {
+    background-color: #ccc;
+  }
+  

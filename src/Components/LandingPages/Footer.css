@@ -1,0 +1,190 @@
+.contact_box {
+  list-style: none;
+  padding: 0;
+}
+
+.contact-item {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 10px;
+}
+
+.contact-icon {
+  margin-right: 10px;
+  color: #fff; /* Adjust the color to match your theme */
+}
+
+.footer-heading {
+  color: #fff; /* Adjust the color to match your theme */
+}
+
+
+.footer-area {
+    background-color: black;
+    color: white;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    font-family: Arial, sans-serif;
+  }
+  
+  .footer-content {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+  }
+  
+  .logo-container {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .footer-columns {
+    flex: 3;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+  }
+  
+  .footer-columns .widget-container {
+    flex: 1;
+    margin: 10px;
+  }
+  
+.footer-list {
+  list-style: none;
+  padding: 0;
+}
+
+.footer-list li {
+  margin-bottom: 5px;
+}
+
+  .footer-area a {
+    color: white;
+    text-decoration: none;
+    transition: color 0.3s;
+  }
+  
+  .footer-area a:hover {
+    color: #ff6f61; /* Change this to the hover color you want */
+  }
+  
+  .single-footer-widget h4 {
+    margin-top: 20px;
+    font-size: 1.2em;
+    color: #ff6f61; /* Change this to the color you want */
+  }
+  
+  .centered-content {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .follow-icon a {
+    display: inline-block;
+    margin: 5px;
+
+    transition: color 0.3s, transform 0.3s;
+    font-size: 24px;
+  }
+  
+  .follow-icon a:hover {
+    color:red;
+    transform: scale(1.1);
+  }
+  
+  #myBtn {
+    position: fixed;
+    bottom: 20px;
+    right: 30px;
+    display: none;
+    z-index: 99;
+    border: none;
+    outline: none;
+    background-color: #555;
+    color: red;
+    cursor: pointer;
+    padding: 15px;
+    border-radius: 10px;
+  }
+  
+  #myBtn:hover {
+    background-color: #333;
+  }
+  
+  .contact_box li {
+    list-style: none;
+    margin-bottom: 10px;
+  }
+  
+  .contact_box i {
+    margin-right: 10px;
+  }
+  .footer-area .footer-center {
+    margin-top: 140px; /* Adjust this value to your preference */
+  }
+  /* Add these styles to your Footer.css file */
+.social-icon {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  margin: 0 5px; /* Adjust the margin as needed */
+  display: flex;
+  align-items: center;
+}
+
+.social-icon img {
+  width: 40px; /* Adjust the size as needed */
+  height: 40px; /* Adjust the size as needed */
+  transition: transform 0.2s; /* Add a little animation on hover */
+}
+
+.social-icon:hover img {
+  transform: scale(1.1); /* Slightly enlarge the icon on hover */
+}
+.contact-us {
+  @apply flex flex-col items-start mt-4;
+}
+
+.footer-heading {
+  @apply text-2xl font-bold mb-4;
+}
+
+.contact_box {
+  @apply list-none p-0;
+}
+
+.contact-item {
+  @apply flex items-start mb-4;
+}
+
+.contact-icon {
+  @apply mr-2 text-3xl;
+}
+
+.contact-text {
+  @apply font-sans text-base;
+}
+
+.text-blue-500 {
+  color: #3b82f6;
+}
+
+.text-red-500 {
+  color: #ef4444;
+}
+
+.text-green-500 {
+  color: #10b981;
+}
+
+.text-yellow-500 {
+  color: #f59e0b;
+}
+

@@ -145,10 +145,6 @@ const Footer = () => {
             </Grid>
           </Grid>
         </Container>
-
-        <StyledIconButton onClick={topFunction} id="myBtn" title="Go to top">
-          <i className="fa fa-chevron-up" color='red'></i>
-        </StyledIconButton>
       </footer>
     </>
   );

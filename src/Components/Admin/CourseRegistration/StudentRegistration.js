@@ -311,6 +311,9 @@ const StudentRegistration = () => {
       <Container>
       <Paper sx={{padding:4,backgroundColor: darkMode ? '#333' : '#fff',
           color: darkMode ? '#fff' : '#000',}}>
+        <Typography variant="h4" gutterBottom sx={{textAlign:'center'}}>
+          Course Registration
+        </Typography>    
       <Typography variant="h4" gutterBottom>
           Student Details
         </Typography>

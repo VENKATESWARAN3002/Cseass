@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { db } from '../../firebase'; // Adjust path as necessary
 import { collection, getDocs, doc } from 'firebase/firestore';
-import { Container, Typography, Box, CircularProgress, Paper, Grid, Tooltip, Card, CardActionArea, CardContent, Collapse, ListItem, ListItemText } from '@mui/material';
+import { Container, AppBar,Typography, Box, CircularProgress, Paper, Grid, Tooltip, Card, CardActionArea, CardContent, Collapse, ListItem, ListItemText } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import ImageIcon from '@mui/icons-material/Image';
 import SchoolIcon from '@mui/icons-material/School';
+import Header from './CourseRegistration/Header';
+import StudentSideBar from '../Student/StudentSideBar';
 
 const Root = styled(Container)(({ theme }) => ({
   marginTop: theme.spacing(4),
@@ -136,8 +138,16 @@ const ViewSyllabus = () => {
   };
 
   return (
-    <Root>
-      <Typography variant="h4" gutterBottom>Syllabus</Typography>
+    <Container>
+      <AppBar sx={{bgcolor:'grey.100'}}>
+      <Header/>
+      </AppBar>
+      <div style={{ display: 'flex', flexDirection: 'row'}}>
+        <Paper sx={{marginTop:25}}>
+      <StudentSideBar/>
+      </Paper>
+      <Paper sx={{marginTop:25, padding:2}}>
+      <Typography variant="h4" gutterBottom sx={{textAlign:'center'}}>Syllabus Repository</Typography>
       <ProgramPaper elevation={3}>
         <Grid container spacing={5}>
           {programs.map((program) => (
@@ -192,7 +202,9 @@ const ViewSyllabus = () => {
           ))}
         </Grid>
       </ProgramPaper>
-    </Root>
+      </Paper>
+      </div>
+    </Container>
   );
 };
 

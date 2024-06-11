@@ -7,7 +7,7 @@ import { doc, collection, setDoc } from 'firebase/firestore';
 const UploadStudyMaterial = ({ courseId ,facultyName}) => {
     const [file, setFile] = useState(null);
     const [description, setDescription] = useState('');
-    const [materialName, setMaterialName] = useState('');
+    
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
   };
@@ -17,7 +17,6 @@ const UploadStudyMaterial = ({ courseId ,facultyName}) => {
       const fileRef = ref(storage, `study_materials/${courseId}/${file.name}`);
       await uploadBytes(fileRef, file);
       const fileURL = await getDownloadURL(fileRef);
-
       const courseDocRef = doc(db, 'tbl_course', courseId);
       const studyMaterialsRef = collection(courseDocRef, 'study_materials');
 

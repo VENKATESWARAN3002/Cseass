@@ -1,10 +1,50 @@
 import React, { useState, useEffect } from 'react';
-import {getDocs,collection,query,where,deleteDoc,updateDoc} from 'firebase/firestore';
+import {
+  getDocs,
+  collection,
+  query,
+  where,
+  deleteDoc,
+  updateDoc,
+} from 'firebase/firestore';
 import { db } from '../../../firebase';
 import StudentDetailsModal from '../../Student/StudentDetailsModal';
 import UpdateStudentForm from './UpdateStudentForm';
-import {Table,TableBody,TableCell,TableContainer,TableHead,TableRow,Paper,Button,Snackbar,Alert,Slide,Box,Typography,IconButton,TextField,CircularProgress,TablePagination,Checkbox,Dialog,DialogActions,DialogContent, DialogContentText,DialogTitle,Switch,useMediaQuery,useTheme,Tooltip,} from '@mui/material';
-import {Edit as EditIcon, Delete as DeleteIcon,Visibility as VisibilityIcon,CheckBox as CheckBoxIcon,CheckBoxOutlineBlank as CheckBoxOutlineBlankIcon,
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Button,
+  Snackbar,
+  Alert,
+  Slide,
+  Box,
+  Typography,
+  IconButton,
+  TextField,
+  CircularProgress,
+  TablePagination,
+  Checkbox,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Switch,
+  useMediaQuery,
+  useTheme,
+  Tooltip,
+} from '@mui/material';
+import {
+  Edit as EditIcon,
+  Delete as DeleteIcon,
+  Visibility as VisibilityIcon,
+  CheckBox as CheckBoxIcon,
+  CheckBoxOutlineBlank as CheckBoxOutlineBlankIcon,
 } from '@mui/icons-material';
 
 const StudentsList = ({ students = [] }) => {
@@ -167,8 +207,8 @@ const StudentsList = ({ students = [] }) => {
   };
 
   return (
-    <Box sx={{width: '100%', height: '100%',padding: 4,backgroundColor: darkMode ? '#1c1c1c' : '#f5f5f5',color: darkMode ? '#fff' : '#000',borderRadius: 2,boxShadow: 3,}}>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2, }} >
+    <Box sx={{ width: '100%', height: '100%', padding: 4, backgroundColor: darkMode ? '#1c1c1c' : '#f5f5f5', color: darkMode ? '#fff' : '#000', borderRadius: 2, boxShadow: 3 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
         <Typography variant="h4" gutterBottom>Students</Typography>
         <Box>
           <Typography component="span" sx={{ mr: 1 }}>Dark Mode</Typography>
@@ -176,7 +216,7 @@ const StudentsList = ({ students = [] }) => {
         </Box>
       </Box>
       <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
-        <TextField label="Search by Name or RegNo"  variant="outlined" value={searchQuery} onChange={handleSearch} sx={{ width: isMobile ? '100%' : '50%' }}/>
+        <TextField label="Search by Name or RegNo" variant="outlined" value={searchQuery} onChange={handleSearch} sx={{ width: isMobile ? '100%' : '50%' }} />
       </Box>
       {loading ? (
         <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
@@ -184,64 +224,70 @@ const StudentsList = ({ students = [] }) => {
         </Box>
       ) : (
         <>
-          <TableContainer component={Paper} sx={{borderRadius: 2, boxShadow: 3 ,}}>
-            <Table sx={{align:'center'}}>
-              <TableHead sx={{ backgroundColor: darkMode ? '#444' : '#e0e0e0',align:'center' }}>
+          <TableContainer component={Paper} sx={{ borderRadius: 2, boxShadow: 3 }}>
+            <Table sx={{ align: 'center' }}>
+              <TableHead sx={{ backgroundColor: darkMode ? '#444' : '#e0e0e0', align: 'center' }}>
                 <TableRow>
-                  <TableCell padding="checkbox" style={{ background: 'rgb(166, 34, 34)'}}>
-                    <Checkbox icon={<CheckBoxOutlineBlankIcon />}checkedIcon={<CheckBoxIcon />}onChange={handleSelectAll}
-                      indeterminate={ selectedStudents.length > 0 && selectedStudents.length < filteredStudents.length }
-                      checked={filteredStudents.length > 0 && selectedStudents.length === filteredStudents.length } />
+                  <TableCell padding="checkbox" style={{ background: 'rgb(166, 34, 34)' }}>
+                    <Checkbox
+                      icon={<CheckBoxOutlineBlankIcon />}
+                      checkedIcon={<CheckBoxIcon />}
+                      onChange={handleSelectAll}
+                      indeterminate={selectedStudents.length > 0 && selectedStudents.length < filteredStudents.length}
+                      checked={filteredStudents.length > 0 && selectedStudents.length === filteredStudents.length}
+                    />
                   </TableCell>
-                  <TableCell align="center" style={{ background: 'rgb(166, 34, 34)',color:'white',fontWeight:'bold'}}>REGISTER NO</TableCell>
-                  <TableCell align="center" style={{ background: 'rgb(166, 34, 34)',color:'white',fontWeight:'bold'}}>NAME</TableCell>
-                  <TableCell align="center" style={{ background: 'rgb(166, 34, 34)',color:'white',fontWeight:'bold'}}>E-MAIL</TableCell>
-                  <TableCell align="center" style={{ background: 'rgb(166, 34, 34)',color:'white',fontWeight:'bold'}}>PHONE</TableCell>
-                  <TableCell align="center" style={{ background: 'rgb(166, 34, 34)',color:'white',fontWeight:'bold'}}>DOB</TableCell>
-                  <TableCell align="center" style={{ background: 'rgb(166, 34, 34)',color:'white',fontWeight:'bold'}}>GENDER</TableCell>
-                  <TableCell align="center" style={{ background: 'rgb(166, 34, 34)',color:'white',fontWeight:'bold'}}>ACTIONS</TableCell>
+                  <TableCell align="center" style={{ background: 'rgb(166, 34, 34)', color: 'white', fontWeight: 'bold' }}>REGISTER NO</TableCell>
+                  <TableCell align="center" style={{ background: 'rgb(166, 34, 34)', color: 'white', fontWeight: 'bold' }}>NAME</TableCell>
+                  <TableCell align="center" style={{ background: 'rgb(166, 34, 34)', color: 'white', fontWeight: 'bold' }}>E-MAIL</TableCell>
+                  <TableCell align="center" style={{ background: 'rgb(166, 34, 34)', color: 'white', fontWeight: 'bold' }}>PHONE</TableCell>
+                  <TableCell align="center" style={{ background: 'rgb(166, 34, 34)', color: 'white', fontWeight: 'bold' }}>DOB</TableCell>
+                  <TableCell align="center" style={{ background: 'rgb(166, 34, 34)', color: 'white', fontWeight: 'bold' }}>GENDER</TableCell>
+                  <TableCell align="center" style={{ background: 'rgb(166, 34, 34)', color: 'white', fontWeight: 'bold' }}>ACTIONS</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
-              {filteredStudents.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((student, index) => (
-                <TableRow
-                  key={index}
-                  sx={{backgroundColor:index % 2 === 0 ? 'rgb(232, 208, 208)' : 'rgb(244, 233, 233)'} }
-                  hover
-                >
-                      <TableCell padding="checkbox">
-                        <Checkbox checked={selectedStudents.includes(student.register_no)} onChange={() => handleSelectStudent(student)} icon={<CheckBoxOutlineBlankIcon />} checkedIcon={<CheckBoxIcon />} />
-                      </TableCell>
-                      <TableCell align="center" >{student.register_no}</TableCell>
-                      <TableCell align="center" >{student.std_name}</TableCell>
-                      <TableCell align="center" >{student.std_email}</TableCell>
-                      <TableCell align="center" >{student.std_phone}</TableCell                      >
-                      <TableCell align="center" width="200px">{student.std_dob}</TableCell>
-                      <TableCell align="center" >{student.std_gender}</TableCell>
-                      <TableCell align="center">
-                        <Box sx={{display: 'flex', justifyContent: 'space-between'}}>
-                          <Tooltip title="View">
-                              <VisibilityIcon fontSize="small" sx={{ padding: '5px 10px',cursor: 'pointer',color:'rgb(50,46,162)',marginRight:1}} onClick={() => {setSelectedStudent(student); setShowModal(true);}}/>
-                          </Tooltip>
-                          <Dialog open={openDialog} onClose={handleCloseDialog}>
-        <StudentDetailsModal student={student} />
-      </Dialog>
-                          <Tooltip title="Edit">
-                              <EditIcon fontSize="small" sx={{ padding: '5px 10px',cursor: 'pointer',color:'rgb(2,198,53)',marginRight:1}}onClick={() => {setSelectedStudent(student); setShowUpdateForm(true)
-                                const modalElement = document.getElementById('Edit-modal');
-                                if (modalElement) {
-                                  modalElement.scrollIntoView({ behavior: 'smooth' });
-                                }
-                              }}
-                               />
-                          </Tooltip>
-                          <Tooltip title="Delete">
-                              <DeleteIcon fontSize="small" sx={{ padding: '5px 10px'}} color="error"onClick={() => {setSelectedStudent(student);handleDeleteConfirmation();}}/>
-                          </Tooltip>
-                        </Box>
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                {filteredStudents.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((student, index) => (
+                  <TableRow
+                    key={index}
+                    sx={{ backgroundColor: index % 2 === 0 ? 'rgb(232, 208, 208)' : 'rgb(244, 233, 233)' }}
+                    hover
+                  >
+                    <TableCell padding="checkbox">
+                      <Checkbox
+                        checked={selectedStudents.includes(student.register_no)}
+                        onChange={() => handleSelectStudent(student)}
+                        icon={<CheckBoxOutlineBlankIcon />}
+                        checkedIcon={<CheckBoxIcon />}
+                      />
+                    </TableCell>
+                    <TableCell align="center">{student.register_no}</TableCell>
+                    <TableCell align="center">{student.std_name}</TableCell>
+                    <TableCell align="center">{student.std_email}</TableCell>
+                    <TableCell align="center">{student.std_phone}</TableCell>
+                    <TableCell align="center" width="200px">{student.std_dob}</TableCell>
+                    <TableCell align="center">{student.std_gender}</TableCell>
+                    <TableCell align="center">
+                      <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                        <Tooltip title="View">
+                          
+                            <VisibilityIcon fontSize="small" onClick={() => { setSelectedStudent(student); setShowModal(true); }} sx={{ color: 'rgb(50,46,162)',cursor:'pointer',marginRight:2}} />
+                          
+                        </Tooltip>
+                        <Tooltip title="Edit">
+                          
+                            <EditIcon fontSize="small"  onClick={() => { setSelectedStudent(student); setShowUpdateForm(true); }}sx={{ color: 'rgb(2,198,53)',cursor:'pointer',marginRight:2 }} />
+                          
+                        </Tooltip>
+                        <Tooltip title="Delete">
+                          
+                            <DeleteIcon fontSize="small"onClick={() => { setSelectedStudent(student); handleDeleteConfirmation(); }} color="error" sx={{cursor:'pointer'}} />
+                          
+                        </Tooltip>
+                      </Box>
+                    </TableCell>
+                  </TableRow>
+                ))}
               </TableBody>
             </Table>
           </TableContainer>
@@ -305,20 +351,20 @@ const StudentsList = ({ students = [] }) => {
           </Button>
         </DialogActions>
       </Dialog>
-      
+
       {showModal && selectedStudent && (
         <Box id="student-modal">
-        <StudentDetailsModal  student={selectedStudent} onClose={closeModal} />
+          <StudentDetailsModal student={selectedStudent} onClose={closeModal} />
         </Box>
       )}
-      
+
       {showUpdateForm && selectedStudent && (
-          <Box id='Edit-modal'>
-        <UpdateStudentForm
-          student={selectedStudent}
-          onClose={closeModal}
-          onUpdate={updateStudent}
-        />
+        <Box id="Edit-modal">
+          <UpdateStudentForm
+            student={selectedStudent}
+            onClose={closeModal}
+            onUpdate={updateStudent}
+          />
         </Box>
       )}
     </Box>
@@ -326,4 +372,3 @@ const StudentsList = ({ students = [] }) => {
 };
 
 export default StudentsList;
-

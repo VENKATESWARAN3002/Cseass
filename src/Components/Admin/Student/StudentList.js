@@ -270,19 +270,13 @@ const StudentsList = ({ students = [] }) => {
                     <TableCell align="center">
                       <Box sx={{ display: 'flex', justifyContent: 'center' }}>
                         <Tooltip title="View">
-                          
                             <VisibilityIcon fontSize="small" onClick={() => { setSelectedStudent(student); setShowModal(true); }} sx={{ color: 'rgb(50,46,162)',cursor:'pointer',marginRight:2}} />
-                          
                         </Tooltip>
                         <Tooltip title="Edit">
-                          
                             <EditIcon fontSize="small"  onClick={() => { setSelectedStudent(student); setShowUpdateForm(true); }}sx={{ color: 'rgb(2,198,53)',cursor:'pointer',marginRight:2 }} />
-                          
                         </Tooltip>
-                        <Tooltip title="Delete">
-                          
-                            <DeleteIcon fontSize="small"onClick={() => { setSelectedStudent(student); handleDeleteConfirmation(); }} color="error" sx={{cursor:'pointer'}} />
-                          
+                        <Tooltip title="Delete"> 
+                            <DeleteIcon fontSize="small"onClick={() => { setSelectedStudent(student); handleDeleteConfirmation(); }} color="error" sx={{cursor:'pointer'  }} />
                         </Tooltip>
                       </Box>
                     </TableCell>

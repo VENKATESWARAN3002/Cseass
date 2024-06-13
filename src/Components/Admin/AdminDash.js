@@ -72,7 +72,7 @@ const AdminDash = () => {
         },
         title: {
           display: true,
-          text: `Enrollment Statistics for ${program}`,
+          text: `Course Enrollment Statistics for ${program}`,
         },
       },
       scales: {
@@ -229,7 +229,7 @@ const AdminDash = () => {
               <CardContent sx={{ textAlign: 'center' }}>
                 <BarChartIcon sx={{ fontSize: 40, color: 'success.main' }} />
                 <Typography variant="h5" component="div">
-                  Enrollment Statistics
+                  Course Enrollment Statistics
                 </Typography>
                 <canvas ref={chartRef} width="400" height="200"></canvas>
               </CardContent>

@@ -88,14 +88,6 @@ const Home = () => {
         </div>
         <div className="desktop-nav__link-section">
           <a
-            href="#program"
-            className="desktop-nav__link desktop-nav__main-link "
-          >
-            Program
-          </a>
-        </div>
-        <div className="desktop-nav__link-section">
-          <a
             href="#last"
             className="desktop-nav__link desktop-nav__main-link "
           >
@@ -157,33 +149,6 @@ const Home = () => {
             Research Projects, Consultancy projects and Collaborative Projects
             with other government sectors.
           </p>
-        </div>
-      </div>
-      <div className="title" id="program">
-        <p>Our PROGRAM</p>
-        <h2>What We Offer</h2>
-      </div>
-      <div className="programs">
-        <div className="program">
-          <img src="../../src/css/assests/program-2-DRqwF0EM.png" alt="" />
-          <div className="caption">
-            <img src="./assets/bachelorlogo.png" alt="" />
-            <p>Graduation Degree</p>
-          </div>
-        </div>
-        <div className="program">
-          <img src="./assets/program-2-DRqwF0EM.png" alt="" />
-          <div className="caption">
-            <img src="./assets/masterslogo.png" alt="" />
-            <p>Post Graduation</p>
-          </div>
-        </div>
-        <div className="program">
-          <img src="./assets/program-2-DRqwF0EM.png" alt="" />
-          <div className="caption">
-            <img src="./assets/phdlogo1.png" alt="" />
-            <p>Ph. D. Scholars</p>
-          </div>
         </div>
       </div>
       <button

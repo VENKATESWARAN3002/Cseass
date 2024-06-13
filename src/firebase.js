@@ -4,12 +4,12 @@ import 'firebase/compat/firestore';
 import 'firebase/compat/storage'; // Import Firebase Storage
 
 const firebaseConfig = {
-    apiKey: "AIzaSyB7d2oylP9wF9ObBUBZ987F5a-skGZFzxM",
-    authDomain: "cse-aas-beta.firebaseapp.com",
-    projectId: "cse-aas-beta",
-    storageBucket: "cse-aas-beta.appspot.com",
-    messagingSenderId: "834647267198",
-    appId: "1:834647267198:web:de571358d671ce544c852f"
+    apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
+    authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
+    projectId:process.env.REACT_APP_FIREBASE_PROJECT_ID ,
+    storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
+    messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
+    appId:process.env.REACT_APP_FIREBASE_APP_ID
 };
 
 const app = firebase.initializeApp(firebaseConfig);

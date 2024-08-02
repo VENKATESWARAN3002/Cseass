@@ -1,60 +1,212 @@
 import React, { useState, useEffect } from 'react';
-import { getDocs, addDoc, collection, where, query, orderBy, doc, getDoc } from 'firebase/firestore';
+import { getDocs, setDoc, collection, where, query, orderBy, doc, getDoc } from 'firebase/firestore';
 import { db } from '../../firebase'; // Replace with your Firebase configuration
 import AcademicPerformanceList from './AcademicPerformanceList';
 import {
-  Container,
-  Typography,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  TextField,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  Button,
-  CircularProgress,
-  Snackbar,
-  Alert,
-  Box,
+  Container, Typography, FormControl, InputLabel, Select,
+  Grid, Tooltip, CardActionArea, Card, CardContent, MenuItem,
+  Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
+  Paper, Button, CircularProgress, Snackbar, Alert, Box,
 } from '@mui/material';
 import AdminHeader from '../../css/AdminHeader';
 import AdminSideBar from '../Admin/AdminSideBar';
+import SchoolIcon from '@mui/icons-material/School';
+import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { styled } from '@mui/system';
+
+const theme = createTheme({
+  typography: {
+    fontFamily: '"Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande", "Lucida Sans", Arial, sans-serif',
+  },
+  palette: {
+    background: {
+      default: '#f5f5f5', // Greyish white
+    },
+    primary: {
+      main: '#795548', // Warm brown
+    },
+    secondary: {
+      main: '#e74c3c', // Cherry red
+    },
+  },
+}); 
+
 function SemPerf() {
   const [students, setStudents] = useState([]);
   const [courses, setCourses] = useState([]);
   const [selectedStudent, setSelectedStudent] = useState('');
   const [program, setProgram] = useState('');
+  const [isLoading, setIsLoading] = useState(false); // added on [5.8.24]
+  const [programs, setPrograms] = useState([]);  // added on [5.8.24]
+  const [selectedYear, setSelectedYear] = useState(null);  // added on [5.8.24]
+  const [selectedProgram, setSelectedProgram] = useState(null);  // added on [5.8.24]
+  const [academicYears, setAcademicYears] = useState([]);  // added on [5.8.24]
+  const [academic_year,setAcademicYear] =useState(' ');  // added on [5.8.24]
   const [selectedCourse, setSelectedCourse] = useState('');
   const [courseList, setCourseList] = useState([]);
   const [semesters, setSemesters] = useState([]);
   const [selectedSemester, setSelectedSemester] = useState('');
   const [showRemoveButton, setShowRemoveButton] = useState(false);
   const [gpa, setGpa] = useState(0);
+  const [cgpa, setCgpa] = useState(0); // added on [5.8.24]
+  const [totalCredits, setTotalCredits] = useState(0); // added on [5.8.24]
+  const [totalPoints, setTotalPoints] = useState(0); // added on [5.8.24]
   const [registeredCourses, setRegisteredCourses] = useState([]);
   const [semesterExists, setSemesterExists] = useState(false);
   const [loading, setLoading] = useState(false);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState('success');
+  
+  // added on [5.8.24]
+  useEffect(() => {
+    fetchPrograms();
+  }, []);
 
-  const getStudents = async () => {
-    const studentsRef = query(collection(db, "tbl_Student"), orderBy('std_name', 'asc'));
+  const fetchPrograms = async () => {
+    setIsLoading(true);
     try {
-      const querySnapshot = await getDocs(studentsRef);
-      const studentOptions = [];
-      querySnapshot.forEach((doc) => {
-        studentOptions.push({ id: doc.id, std_name: doc.data().std_name, program: doc.data().program });
-      });
-      setStudents(studentOptions);
+      const programsCollection = collection(db, 'tbl_program');
+      const querySnapshot = await getDocs(programsCollection);
+      const programData = querySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
+      setPrograms(programData);
     } catch (error) {
-      console.error("Error fetching students:", error);
-      alert("An error occurred. Please try again.");
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const fetchAcademicYears = async (programName) => {
+    if (!programName) return;
+
+    try {
+      const programQuery = query(collection(db, 'tbl_program'), where('program_name', '==', programName));
+      const programQuerySnapshot = await getDocs(programQuery);
+
+      if (programQuerySnapshot.empty) {
+        console.warn(`Program with name "${programName}" not found.`);
+        return;
+      }
+
+      const programDoc = programQuerySnapshot.docs[0];
+      const programRef = doc(db, 'tbl_program', programDoc.id);
+
+      const academicYearsCollection = collection(programRef, 'academic_year');
+      const academicYearsSnapshot = await getDocs(academicYearsCollection);
+
+      const academicYearsData = academicYearsSnapshot.docs.map(doc => doc.data());
+      setAcademicYears(academicYearsData);
+    } catch (error) {
+      console.error('Error fetching academic years:', error);
+    }
+  };
+
+  const fetchStudentDetails = async (programName, academicYear) => {
+    setIsLoading(true);
+  
+    console.log('Fetching student details for:', { programName, academicYear }); // Logging
+  
+    try {
+      let studentQuery;
+  
+      // Validate programName before creating the query
+      if (!programName) {
+        throw new Error('programName is undefined');
+      }
+  
+      if (academicYear) {
+        // Validate academicYear before using it in the query
+        if (!academicYear) {
+          throw new Error('academicYear is undefined');
+        }
+  
+        studentQuery = query(
+          collection(db, 'tbl_Student'),
+          where('program', '==', programName),
+          where('academic_year', '==', academicYear)
+        );
+      } else {
+        studentQuery = query(
+          collection(db, 'tbl_Student'),
+          where('program', '==', programName)
+        );
+      }
+  
+      const studentSnapshot = await getDocs(studentQuery);
+  
+      if (studentSnapshot.empty) {
+        console.warn(`No students found for program "${programName}"${academicYear ? ` and year "${academicYear}"` : ''}.`);
+        setSnackbarMessage(`No students found for program "${programName}"${academicYear ? ` and year "${academicYear}"` : ''}.`);
+        setSnackbarOpen(true);
+        setStudents([]); // Clear the students if none are found
+        return;
+      }
+  
+      const studentData = studentSnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
+      studentData.sort((a, b) => a.register_no - b.register_no);
+      setStudents(studentData);
+    } catch (error) {
+      console.error('Error fetching student details:', error);
+      setSnackbarMessage('Error fetching student details');
+      setSnackbarOpen(true);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+  const fetchSemesters = async (programName) => {
+    const programSemesters = {
+      'MCA': ['First', 'Second', 'Third', 'Fourth'],
+      'M.Tech': ['First', 'Second', 'Third', 'Fourth'],
+      'B.Tech(CSE)': ['First', 'Second', 'Third', 'Fourth', 'Fifth', 'Sixth', 'Seventh', 'Eighth']
+    };
+
+    const semestersForProgram = programSemesters[programName] || [];
+    setSemesters(semestersForProgram);
+    setSelectedSemester('');
+  };
+
+  const handleProgramSelect = async (programData) => {
+    setSelectedProgram(programData);
+    setSelectedYear(null);
+    setStudents([]);
+    await fetchAcademicYears(programData.program_name);
+    await fetchStudentDetails(programData.program_name);
+  };
+  
+
+  const handleYearSelect = async (year) => {
+    setSelectedYear(year);
+    if (selectedProgram) {
+      await fetchStudentDetails(selectedProgram.program_name, year);
+    } else {
+      console.error('No program selected');
+    }
+  };
+  
+
+  const handleStudentChange = async (event) => {
+    const studentId = event.target.value;
+    setSelectedStudent(studentId);
+    if (studentId) {
+      const studentDocRef = doc(db, 'tbl_Student', studentId);
+      const studentDoc = await getDoc(studentDocRef);
+      if (studentDoc.exists()) {
+        const programName = studentDoc.data().program;
+        const academic_year = studentDoc.data().academic_year;
+        setProgram(programName);
+        setAcademicYear(academic_year);
+        await fetchSemesters(programName);
+        // Assuming calculateCgpa is defined elsewhere
+        await calculateCgpa(studentId);
+      }
+    } else {
+      setProgram('');
+      setSemesters([]);
+      setSelectedSemester('');
+      setCgpa(0);
     }
   };
 
@@ -73,17 +225,6 @@ function SemPerf() {
     }
   };
 
-  const updateSemesters = (programName) => {
-    const programSemesters = {
-      'MCA': ['First', 'Second', 'Third', 'Fourth'],
-      'M.Tech': ['First', 'Second', 'Third', 'Fourth'],
-      'B.Tech(CSE)': ['First', 'Second', 'Third', 'Fourth', 'Fifth', 'Sixth', 'Seventh', 'Eighth']
-    };
-
-    const semestersForProgram = programSemesters[programName] || [];
-    setSemesters(semestersForProgram);
-    setSelectedSemester(''); // Reset selected semester when program changes
-  };
 
   const getRegisteredCourses = async () => {
     if (!selectedStudent || !selectedSemester) return;
@@ -136,7 +277,6 @@ function SemPerf() {
   };
 
   useEffect(() => {
-    getStudents();
     getCourses();
   }, []);
 
@@ -144,58 +284,32 @@ function SemPerf() {
     getRegisteredCourses();
   }, [selectedSemester, selectedStudent]);
 
-  const addCourse = () => {
-    const newCourseList = [...courseList];
-    const courseToAdd = courses.find((course) => course.id === selectedCourse);
-    if (!courseToAdd) return;
-
-    newCourseList.push({
-      courseId: courseToAdd.id,
-      c_code: courseToAdd.c_code,
-      c_name: courseToAdd.c_name,
-      grade: '',
-      c_TC: courseToAdd.c_TC
-    });
-    setSelectedCourse('');
-    setCourseList(newCourseList);
-    setShowRemoveButton(newCourseList.length > 0);
-  };
-
   const handleGradeChange = (index, grade) => {
     const newRegisteredCourses = [...registeredCourses];
     newRegisteredCourses[index].grade = grade;
     setRegisteredCourses(newRegisteredCourses);
 
-    console.group(`Grade Change for Course ${index + 1}`);
-    console.log('Selected Grade:', grade);
+    
 
     let totalPoints = 0;
     let totalCredits = 0;
+    let earnedCredits = 0;
 
     newRegisteredCourses.forEach((course, i) => {
       const gradePoints = getGradePoints(course.grade);
-      const c_TC = course.c_TC;
+      const c_TC = parseFloat(course.c_TC);
       const coursePoints = gradePoints * c_TC;
-
-      console.log(`Course ${i + 1}: ${course.c_name} (${course.c_code})`);
-      console.log('Grade:', course.grade);
-      console.log('Grade Points:', gradePoints);
-      console.log('Credits:', c_TC);
-      console.log('Course Points:', coursePoints);
-      console.log('---');
-
       totalPoints += coursePoints;
       totalCredits += parseFloat(c_TC);
+
+      if (course.grade !== 'F') {
+        earnedCredits += c_TC;
+      }
     });
-
-    console.log('Total Points:', totalPoints);
-    console.log('Total Credits:', totalCredits);
-
     const gpa = totalCredits ? (totalPoints / totalCredits).toFixed(2) : 0;
-    console.log('GPA:', gpa);
-    console.groupEnd();
-
     setGpa(gpa);
+    setTotalCredits(earnedCredits);
+    setTotalPoints(totalPoints);
   };
 
   const getGradePoints = (grade) => {
@@ -211,47 +325,6 @@ function SemPerf() {
     }
   };
 
-  const calculateGpa = (courseList) => {
-    let totalPoints = 0;
-    let totalCredits = 0;
-
-    courseList.forEach(course => {
-      const gradePoints = getGradePoints(course.grade);
-      totalPoints += gradePoints * course.c_TC;
-      totalCredits += parseFloat(course.c_TC);
-    });
-
-    const gpa = totalCredits ? (totalPoints / totalCredits).toFixed(2) : 0;
-    setGpa(gpa);
-  };
-
-  const removeCourse = (index) => {
-    const newCourseList = [...courseList];
-    newCourseList.splice(index, 1);
-    setCourseList(newCourseList);
-    setShowRemoveButton(newCourseList.length > 0);
-    calculateGpa(newCourseList); // Recalculate GPA when courses are removed
-  };
-
-  const handleStudentChange = async (event) => {
-    const studentId = event.target.value;
-    setSelectedStudent(studentId);
-    setRegisteredCourses([]);
-
-    if (studentId) {
-      const studentDocRef = doc(db, 'tbl_Student', studentId);
-      const studentDoc = await getDoc(studentDocRef);
-      if (studentDoc.exists()) {
-        const programName = studentDoc.data().program;
-                setProgram(programName);
-        updateSemesters(programName);
-      }
-    } else {
-      setProgram('');
-      setSemesters([]);
-    }
-  };
-
   const handleChangeSemester = async (event) => {
     const semester = event.target.value;
     setSelectedSemester(semester);
@@ -261,78 +334,12 @@ function SemPerf() {
     }
   };
 
-  const handleCourseChange = (event) => {
-    setSelectedCourse(event.target.value);
-  };
-
   const checkIfPerformanceExists = async (studentId, semester) => {
     const studentDocRef = doc(db, 'tbl_Student', studentId);
     const performanceCollectionRef = collection(studentDocRef, 'academic_performance');
     const performanceQuery = query(performanceCollectionRef, where('semester', '==', semester));
     const querySnapshot = await getDocs(performanceQuery);
     return !querySnapshot.empty;
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-
-    if (!selectedStudent || registeredCourses.length === 0) {
-      alert('Please select a student and add courses!');
-      setLoading(false);
-      return;
-    }
-
-    const performanceExists = await checkIfPerformanceExists(selectedStudent, selectedSemester);
-    if (performanceExists) {
-      alert('Performance data for this semester already exists for the selected student.');
-      setLoading(false);
-      return;
-    }
-
-    const performanceData = {
-      program,
-      semester: selectedSemester,
-      courses: registeredCourses.map((course) => ({
-        courseId: course.id,
-        c_code: course.c_code,
-        c_name: course.c_name,
-        c_TC: course.c_TC,
-        grade: course.grade || '', // Ensure grade is not undefined
-      })),
-      gpa: parseFloat(gpa),
-    };
-
-    // Log the performanceData to the console
-    console.log('Performance Data to be stored:', performanceData);
-
-    const studentDocRef = doc(db, 'tbl_Student', selectedStudent);
-    const performanceCollectionRef = collection(studentDocRef, 'academic_performance');
-
-    // Validate that all necessary fields are present and not undefined
-    const isValid = validatePerformanceData(performanceData);
-    if (!isValid) {
-      alert('Invalid performance data. Please check the data and try again.');
-      setLoading(false);
-      return;
-    }
-
-    try {
-      await addDoc(performanceCollectionRef, performanceData);
-      setSnackbarMessage('Performance data stored successfully!');
-      setSnackbarSeverity('success');
-      setSnackbarOpen(true);
-      setSelectedStudent('');
-      setProgram('');
-      setRegisteredCourses([]);
-    } catch (error) {
-      console.error('Error storing performance:', error);
-      setSnackbarMessage('An error occurred. Please try again.');
-      setSnackbarSeverity('error');
-      setSnackbarOpen(true);
-    } finally {
-      setLoading(false);
-    }
   };
 
   const validatePerformanceData = (data) => {
@@ -349,8 +356,152 @@ function SemPerf() {
     }
 
     return true;
+  }; 
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    if (!selectedStudent || registeredCourses.length === 0) {
+        alert('Please select a student and add courses!');
+        setLoading(false);
+        return;
+    }
+
+    const performanceExists = await checkIfPerformanceExists(selectedStudent, selectedSemester);
+    if (performanceExists) {
+        alert('Performance data for this semester already exists for the selected student.');
+        setLoading(false);
+        return;
+    }
+
+    // Calculate current semester total points and credits
+    let currentTotalPoints = 0;
+    let currentTotalCredits = 0;
+
+    registeredCourses.forEach(course => {
+        const gradePoints = getGradePoints(course.grade);
+        const coursePoints = gradePoints * parseFloat(course.c_TC);
+        currentTotalPoints += coursePoints;
+        currentTotalCredits += parseFloat(course.c_TC);
+    });
+
+    const currentGpa = currentTotalCredits ? (currentTotalPoints / currentTotalCredits).toFixed(2) : 0;
+
+    // Fetch previous performance data and calculate CGPA including current semester
+    const calculateCgpaIncludingCurrentSemester = async () => {
+        const studentDocRef = doc(db, 'tbl_Student', selectedStudent);
+        const performanceCollectionRef = collection(studentDocRef, 'academic_performance');
+
+        try {
+            const performanceQuery = await getDocs(performanceCollectionRef);
+            let totalCredits = currentTotalCredits;
+            let totalPoints = currentTotalPoints;
+
+            performanceQuery.forEach((doc) => {
+                const data = doc.data();
+                totalCredits += parseFloat(data.totalCredits || 0);
+                totalPoints += parseFloat(data.totalPoints || 0);
+            });
+
+            const cgpa = totalCredits ? (totalPoints / totalCredits).toFixed(2) : 0;
+            return cgpa;
+        } catch (error) {
+            console.error('Error calculating CGPA:', error);
+            return 0;
+        }
+    };
+
+    const cgpa = await calculateCgpaIncludingCurrentSemester();
+
+    const performanceData = {
+        program,
+        academic_year,
+        semester: selectedSemester,
+        courses: registeredCourses.map((course) => ({
+            courseId: course.id,
+            c_code: course.c_code,
+            c_name: course.c_name,
+            c_TC: course.c_TC,
+            grade: course.grade || '',
+        })),
+        gpa: parseFloat(currentGpa),
+        cgpa: parseFloat(cgpa),
+        totalPoints: currentTotalPoints,
+        totalCredits: currentTotalCredits,
+        timestamp: new Date()
+    };
+
+    // Log the performanceData to the console
+    console.log('Performance Data to be stored:', performanceData);
+
+    const studentDocRef = doc(db, 'tbl_Student', selectedStudent);
+    const performanceCollectionRef = doc(studentDocRef, 'academic_performance',`semester${selectedSemester}`);
+
+    // Validate that all necessary fields are present and not undefined
+    const isValid = validatePerformanceData(performanceData);
+    if (!isValid) {
+        alert('Invalid performance data. Please check the data and try again.');
+        setLoading(false);
+        return;
+    }
+
+    try {
+        await setDoc(performanceCollectionRef, performanceData);
+        setSnackbarMessage('Performance data stored successfully!');
+        setSnackbarSeverity('success');
+        setSnackbarOpen(true);
+        setSelectedStudent('');
+        setProgram('');
+        setRegisteredCourses([]);
+        await calculateCgpa(selectedStudent); // Recalculate CGPA for display purposes
+    } catch (error) {
+        console.error('Error storing performance:', error);
+        setSnackbarMessage('An error occurred. Please try again.');
+        setSnackbarSeverity('error');
+        setSnackbarOpen(true);
+    } finally {
+        setLoading(false);
+    }
+};
+
+  const calculateGpa = (courseList) => {
+    let totalPoints = 0;
+    let totalCredits = 0;
+
+    courseList.forEach(course => {
+      const gradePoints = getGradePoints(course.grade);
+      totalPoints += gradePoints * course.c_TC;
+      totalCredits += parseFloat(course.c_TC);
+    });
+
+    const gpa = totalCredits ? (totalPoints / totalCredits).toFixed(2) : 0;
+    setGpa(gpa);
   };
 
+  const calculateCgpa = async (studentId) => {
+    const studentDocRef = doc(db, 'tbl_Student', studentId);
+    const performanceCollectionRef = collection(studentDocRef, 'academic_performance');
+
+    try {
+      const performanceQuery = await getDocs(performanceCollectionRef);
+      let totalCredits = 0;
+      let totalPoints = 0;
+
+      performanceQuery.forEach((doc) => {
+        const data = doc.data();
+        totalCredits += parseFloat(data.totalCredits || 0);
+        totalPoints += parseFloat(data.totalPoints || 0);
+      });
+
+      const cgpa = totalCredits ? (totalPoints / totalCredits).toFixed(2) : 0;
+      setCgpa(cgpa);
+    } catch (error) {
+      console.error('Error calculating CGPA:', error);
+    }
+  };
+
+  //added on 5.8.24
   return (
     <>
     <AdminHeader/>
@@ -361,6 +512,88 @@ function SemPerf() {
         <Typography variant="h4" component="h1" gutterBottom>
           Semester Performance
         </Typography>
+        <Box>
+          <Grid container spacing={2} justifyContent={'center'}>
+            <Grid item xs={12} md={4}>
+              <Typography component="h5" variant="h5" sx={{ padding: 2 }}>Programs</Typography>
+              <Paper elevation={3} sx={{ padding: 2, backgroundColor: theme.palette.background.default }}>
+                <Grid container spacing={2}>
+                  {programs.map((program) => (
+                    <Grid item xs={12} sm={6} md={12} key={program.id} sx={{ padding: 2 , margin:1,}}>
+                      <Tooltip title="Click to select this program" arrow>
+                        <CardActionArea onClick={() => handleProgramSelect(program)}>
+                          <Card
+                            sx={{
+                              fontWeight:'bold',
+                              display: 'flex',
+                              
+                              color: selectedProgram?.id === program.id ? '#fff' : '#000',
+                              background: selectedProgram?.id === program.id ? 'linear-gradient(135deg, #795548, #5d4037)' : '#fff',
+                              transition: 'background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease',
+                              border: selectedProgram?.id === program.id ? `2px solid ${theme.palette.primary.main}` : '2px solid transparent',
+                              padding: 1,
+                              '&:hover': {
+                                transform: 'scale(1.05)',
+                                boxShadow: '0 8px 20px rgba(0, 0, 0, 0.15)',
+                              },
+                            }}
+                          >
+                            <CardContent sx={{ flex: '1 0 auto' }}>
+                              <Typography component="h5" variant="h5" fontSize="1rem">
+                                {program.program_name}
+                              </Typography>
+                            </CardContent>
+                            <SchoolIcon sx={{ margin: 'auto 16px' }} />
+                          </Card>
+                        </CardActionArea>
+                      </Tooltip>
+                    </Grid>
+                  ))}
+                </Grid>
+              </Paper>
+            </Grid>
+            {selectedProgram && (
+              <Grid item xs={12} md={4}>
+                <Typography component="h5" variant="h5" sx={{ padding: 2 }}>Academic Years</Typography>
+                <Paper elevation={3} sx={{ padding: 2, backgroundColor: theme.palette.background.default }}>
+                  <Grid container spacing={2}>
+                    {academicYears.map((year) => (
+                      <Grid item xs={12} sm={6} md={12} key={year.year} sx={{padding: 2 , margin:1, }}>
+                        <Tooltip title="Click to select this year" arrow>
+                          <CardActionArea onClick={() => handleYearSelect(year.year)}>
+                            <Card
+                              sx={{
+                                display: 'flex',
+                                background: selectedYear === year.year ? 'linear-gradient(135deg, #e74c3c, #e74c3c)' : '#fff',
+                                transition: 'background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease',
+                                color: selectedYear === year.year ? '#fff' : '#000',
+                                border: selectedYear === year.year ? `2px solid ${theme.palette.secondary.main}` : '2px solid transparent',
+                                padding: 1,
+                                '&:hover': {
+                                  transform: 'scale(1.05)',
+                                  boxShadow: '0 8px 20px rgba(0, 0, 0, 0.15)',
+                                },
+                              }}
+                            >
+                              <CardContent sx={{ flex: '1 0 auto' }}>
+                                <Typography component="h5" variant="h5" fontSize="1rem">
+                                  {year.year}
+                                </Typography>
+                              </CardContent>
+                              <CalendarTodayIcon sx={{ margin: 'auto 16px' }} />
+                            </Card>
+                          </CardActionArea>
+                        </Tooltip>
+                      </Grid>
+                    ))}
+                  </Grid>
+                </Paper>
+              </Grid>
+            )}
+          </Grid>
+        </Box>
+        {/* Newly Added */}
+        </Box>
         <form onSubmit={handleSubmit}>
           <FormControl fullWidth margin="normal">
             <InputLabel>Student</InputLabel>
@@ -375,17 +608,6 @@ function SemPerf() {
               ))}
             </Select>
           </FormControl>
-          {program && (
-            <TextField
-              label="Program"
-              value={program}
-              fullWidth
-              margin="normal"
-              InputProps={{
-                readOnly: true,
-              }}
-            />
-          )}
           {program && semesters.length > 0 && (
             <FormControl fullWidth margin="normal">
               <InputLabel>Semester</InputLabel>
@@ -458,6 +680,15 @@ function SemPerf() {
                 <Typography variant="body1">
                   GPA: {gpa}
                 </Typography>
+                <Typography variant="h6">
+                  CGPA: {cgpa}
+                </Typography>
+                <Typography variant="h6">
+                  Total Points: {totalPoints}
+                </Typography>
+                <Typography variant="h6">
+                  Total Credits: {totalCredits}
+                </Typography>
               </Box>
             </div>
           )}
@@ -482,7 +713,6 @@ function SemPerf() {
             {snackbarMessage}
           </Alert>
         </Snackbar>
-      </Box>
       <Box sx={{ mt: 4 }}>
         <AcademicPerformanceList />
       </Box>

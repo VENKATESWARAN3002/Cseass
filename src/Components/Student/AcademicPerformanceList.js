@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { db } from '../../firebase';
-import { collection, getDocs, doc, deleteDoc } from 'firebase/firestore';
+import { collection, getDocs, query, where, doc, deleteDoc } from 'firebase/firestore';
 import {
   Container,
   Typography,
@@ -28,19 +28,37 @@ import {
   Snackbar,
   Alert,
   Box,
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel
+  TextField
 } from '@mui/material';
+import { styled } from '@mui/system';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { makeStyles } from '@mui/styles';
 import DeleteIcon from '@mui/icons-material/Delete';
 import BookIcon from '@mui/icons-material/Book';
+import GSIcon from './GSIcon.png';
+import VisibilityIcon from '@mui/icons-material/Visibility';
 
 const theme = createTheme();
 
-const useStyles = makeStyles((theme) => ({
+const GradeSheet = styled('img')({
+  width: 100,
+  height: 100,
+});
+
+const CustomChip = styled(Chip)(({ grade }) => {
+  const gradeColors = {
+    S: { backgroundColor: '#4b3b76', color: 'white' },
+    A: { backgroundColor: '#28a745', color: 'white' },
+    B: { backgroundColor: '#007bff', color: 'white' },
+    C: { backgroundColor: '#ffc107', color: 'white' },
+    D: { backgroundColor: '#fd7e14', color: 'white' },
+    E: { backgroundColor: '#dc3545', color: 'white' },
+    F: { backgroundColor: '#8B0000', color: 'white' },
+  };
+  return gradeColors[grade] || {};
+});
+
+const useStyles = makeStyles(() => ({
   list: {
     padding: 0,
   },
@@ -50,14 +68,6 @@ const useStyles = makeStyles((theme) => ({
       borderBottom: 'none',
     },
   },
-  chip: {
-    fontWeight: 'bold',
-  },
-  gradeA: { backgroundColor: '#28a745', color: 'white' },
-  gradeB: { backgroundColor: '#ffc107', color: 'white' },
-  gradeC: { backgroundColor: '#17a2b8', color: 'white' },
-  gradeD: { backgroundColor: '#fd7e14', color: 'white' },
-  gradeF: { backgroundColor: '#dc3545', color: 'white' },
 }));
 
 function AcademicPerformanceList() {
@@ -68,20 +78,21 @@ function AcademicPerformanceList() {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState('success');
-  const [selectedSemester, setSelectedSemester] = useState('');
-  const [semesters, setSemesters] = useState([
-    'First', 'Second', 'Third', 'Fourth', 'Fifth', 'Sixth', 'Seventh', 'Eighth'
-  ]);
+  const [registerNo, setRegisterNo] = useState('');
+  const [gradeSheetOpen, setGradeSheetOpen] = useState(false);
 
   useEffect(() => {
-    fetchAcademicPerformances();
-  }, []);
+    if (registerNo) {
+      fetchAcademicPerformances();
+    }
+  }, [registerNo]);
 
   const fetchAcademicPerformances = async () => {
     setLoading(true);
     try {
       const studentsCollectionRef = collection(db, 'tbl_Student');
-      const studentsSnapshot = await getDocs(studentsCollectionRef);
+      const q = query(studentsCollectionRef, where('register_no', '==', registerNo));
+      const studentsSnapshot = await getDocs(q);
       const performances = [];
 
       for (const studentDoc of studentsSnapshot.docs) {
@@ -97,8 +108,6 @@ function AcademicPerformanceList() {
           performances.push({ studentId, studentRegNo, docId: performanceDoc.id, ...performanceData });
         });
       }
-
-      performances.sort((a, b) => (a.studentRegNo > b.studentRegNo ? 1 : -1));
 
       setAcademicPerformances(performances);
     } catch (error) {
@@ -136,13 +145,14 @@ function AcademicPerformanceList() {
     }
   };
 
-  const handleSemesterChange = (event) => {
-    setSelectedSemester(event.target.value);
+  const handleRegisterNoChange = (event) => {
+    setRegisterNo(event.target.value);
   };
 
-  const filteredPerformances = selectedSemester
-    ? academicPerformances.filter(performance => performance.semester === selectedSemester)
-    : academicPerformances;
+  const handleViewClick = (performance) => {
+    setSelectedPerformance(performance);
+    setGradeSheetOpen(true);
+  };
 
   const classes = useStyles();
 
@@ -153,23 +163,13 @@ function AcademicPerformanceList() {
           <Typography variant="h4" component="h1" gutterBottom>
             Academic Performance List
           </Typography>
-          <FormControl fullWidth>
-            <InputLabel>Semester</InputLabel>
-            <Select
-              value={selectedSemester}
-              onChange={handleSemesterChange}
-              label="Semester"
-            >
-              <MenuItem value="">
-                <em>All Semesters</em>
-              </MenuItem>
-              {semesters.map((semester) => (
-                <MenuItem key={semester} value={semester}>
-                  {semester}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+          <TextField
+            fullWidth
+            label="Student Registration Number"
+            value={registerNo}
+            onChange={handleRegisterNoChange}
+            sx={{ mb: 2 }}
+          />
           {loading ? (
             <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
               <CircularProgress />
@@ -183,34 +183,24 @@ function AcademicPerformanceList() {
                     <TableCell>Program</TableCell>
                     <TableCell>Semester</TableCell>
                     <TableCell>GPA</TableCell>
-                    <TableCell>Courses</TableCell>
+                    <TableCell>Grade Sheet</TableCell>
                     <TableCell>Action</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {filteredPerformances.map((performance, index) => (
+                  {academicPerformances.map((performance, index) => (
                     <TableRow key={index}>
                       <TableCell>{performance.studentRegNo}</TableCell>
                       <TableCell>{performance.program}</TableCell>
                       <TableCell>{performance.semester}</TableCell>
                       <TableCell>{performance.gpa}</TableCell>
                       <TableCell>
-                        <List className={classes.list}>
-                          {performance.courses && performance.courses.map((course, idx) => (
-                            <ListItem key={idx} className={classes.listItem}>
-                              <ListItemIcon>
-                                <BookIcon color="primary" />
-                              </ListItemIcon>
-                              <Tooltip title={`Course Code: ${course.c_code}`} arrow>
-                                <ListItemText primary={`${course.c_code} - ${course.c_name}`} />
-                              </Tooltip>
-                              <Chip
-                                label={course.grade}
-                                className={`${classes.chip} ${classes[`grade${course.grade.charAt(0)}`]}`}
-                              />
-                            </ListItem>
-                          ))}
-                        </List>
+                        <GradeSheet
+                          src={GSIcon}
+                          onClick={() => handleViewClick(performance)}
+                          color="primary"
+                          sx={{ cursor: 'pointer' }}
+                        />
                       </TableCell>
                       <TableCell>
                         <IconButton onClick={() => handleDeleteClick(performance)} color="secondary">
@@ -239,6 +229,36 @@ function AcademicPerformanceList() {
               </Button>
               <Button onClick={handleDeleteConfirm} color="secondary">
                 Delete
+              </Button>
+            </DialogActions>
+          </Dialog>
+          <Dialog
+            open={gradeSheetOpen}
+            onClose={() => setGradeSheetOpen(false)}
+            fullWidth
+            maxWidth="sm"
+          >
+            <DialogTitle>Grade Sheet</DialogTitle>
+            <DialogContent>
+              {selectedPerformance && (
+                <List className={classes.list}>
+                  {selectedPerformance.courses && selectedPerformance.courses.map((course, idx) => (
+                    <ListItem key={idx} className={classes.listItem}>
+                      <ListItemIcon>
+                        <BookIcon color="primary" />
+                      </ListItemIcon>
+                      <ListItemText primary={`${course.c_code} - ${course.c_name}`} />
+                      <Tooltip title={`Grade: ${course.grade}`} placement="top">
+                        <CustomChip className={classes.chip} grade={course.grade} label={course.grade} />
+                      </Tooltip>
+                    </ListItem>
+                  ))}
+                </List>
+              )}
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={() => setGradeSheetOpen(false)} color="primary">
+                Close
               </Button>
             </DialogActions>
           </Dialog>
